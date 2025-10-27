@@ -1,0 +1,52 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "d4abf409-dca3-4f0c-bf3d-a060cce0f46e",
+  "prevId": "4afea527-38d2-410b-a96f-3a0cfa6a1f57",
+  "tables": {
+    "notes": {
+      "name": "notes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(CURRENT_TIMESTAMP)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {
+      "\"notes\".\"createdAt\"": "\"notes\".\"timestamp\""
+    }
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
