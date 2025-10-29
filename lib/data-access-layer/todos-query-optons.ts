@@ -1,10 +1,11 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import { createNotes, deleteAllNotes, deleteNote, getNotes } from "./todos";
 
-export const getNotesQueryOptions = queryOptions({
-  queryKey: ["notes"],
-  queryFn: getNotes,
-});
+export const getNotesQueryOptions = (sortByLocation: boolean) =>
+  queryOptions({
+    queryKey: ["notes", sortByLocation],
+    queryFn: () => getNotes(sortByLocation),
+  });
 
 export const createNotesMutationOptions = mutationOptions({
   mutationFn: createNotes,
