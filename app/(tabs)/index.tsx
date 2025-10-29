@@ -11,12 +11,16 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { checkForSpatialitetables, checkForSpatialitetablesMutationOptions } from "@/lib/data-access-layer/spatialite-query-options";
+import { DbTables } from "@/components/notes/DbTables";
 
 export default function HomeScreen() {
 
   const [notesPromise] = useState(getNotes());
   const deleteAllNotesMutation = useMutation(deleteAllNotesMutationOptions);
   const createNoteeMutation = useMutation(createNotesMutationOptions);
+  const checkForSpatialitetablesMutation = useMutation(checkForSpatialitetablesMutationOptions);
+  
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -33,8 +37,15 @@ export default function HomeScreen() {
           onPress={() => deleteAllNotesMutation.mutate()}
           disabled={deleteAllNotesMutation.isPending}
         />
+        <Button
+          color={"rgba(42, 26, 7, 1)"}
+          title="check for spatialite tables"
+          onPress={() => checkForSpatialitetablesMutation.mutate()}
+          disabled={checkForSpatialitetablesMutation.isPending}
+        />
         {createNoteeMutation.isPending && <ThemedText>creating notes...</ThemedText>}
         {deleteAllNotesMutation.isPending && <ThemedText>deleting notes...</ThemedText>}
+        <DbTables/>
         <ListBotes getNotesPromise={notesPromise} />
       </ThemedView>
     </SafeAreaView>

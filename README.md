@@ -48,3 +48,8 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/27.3.13750724
+export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+export PATH=$ANDROID_NDK_HOME:$PATH

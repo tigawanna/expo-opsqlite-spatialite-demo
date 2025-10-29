@@ -28,6 +28,7 @@
     },
     "plugins": [
       "expo-router",
+      "./plugins/opsqlite-spatialite/with-spatialite",
       [
         "expo-splash-screen",
         {

@@ -2,6 +2,7 @@ import { MutationCache, QueryClient } from "@tanstack/react-query";
 
 export const queryKeyPrefixes = {
   notes: "notes",
+  checkForSpatialitetables: "checkForSpatialitetables",
 } as const;
 
 type QueryKey = [(typeof queryKeyPrefixes)[keyof typeof queryKeyPrefixes], ...(readonly unknown[])];

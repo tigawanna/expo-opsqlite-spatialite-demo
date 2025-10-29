@@ -20,7 +20,7 @@ export async function createNotes() {
 export async function getNotes() {
   try {
     const res = await db.select().from(notes);
-    console.log("Fetched notes:", res);
+    // console.log("Fetched notes:", res);
     return {
       result: res,
       error: null,
