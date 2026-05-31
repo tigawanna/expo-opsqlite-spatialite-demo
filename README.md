@@ -2,119 +2,119 @@
 
 A demonstration of using [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/index) with [op-sqlite](https://github.com/OP-Engineering/op-sqlite) in a React Native Expo application. This project showcases spatial database capabilities on mobile devices, enabling powerful geospatial queries and operations directly on the device.
 
-## 🚀 Features
+## Features
 
-- **Native Spatial Database**: Full SpatiaLite functionality integrated into React Native
+- **Native Spatial Database**: Full SpatiaLite 5.0.0 functionality integrated into React Native
 - **Drizzle ORM Integration**: Type-safe SQL queries with spatial extensions
 - **Geospatial Queries**: Distance calculations, spatial relationships, and geometry operations
-- **Cross-Platform**: Works on iOS and Android with native performance
-- **Modern Architecture**: Uses Expo Router, React Query, and latest React Native features
+- **Auto-Download Plugin**: SpatiaLite native libs are fetched automatically during `expo prebuild`
+- **16KB Page Aligned**: Android `.so` files built with NDK r29, ready for Play Store
+- **Modern Architecture**: Expo Router, React Query, and latest React Native features
 
-## ⚖️ Why This Approach is Easiest
+## Why This Approach
 
-While alternatives exist, this approach provides the most straightforward way to use SpatiaLite with Expo:
+| Feature | Manual Extension Loading | op-sqlite + Config Plugin |
+|---------|--------------------------|---------------------------|
+| Setup complexity | High | One-time `app.json` config |
+| Drizzle ORM | Not compatible | Full support |
+| PowerSync | Not compatible | Compatible |
+| Native lib management | Manual per-arch copying | Auto-download or local path |
+| Spatial functions | Manual FFI | Direct SQL access |
 
-**Alternative Approach (More Complex):**
-- Manually loading a prebuilt SpatiaLite extension using Expo modules
-- Missing out on the clean integrations that op-sqlite provides
-- Losing access to beautiful ecosystem tools like Drizzle ORM and PowerSync
+## Prerequisites
 
-**This Approach (Easiest):**
-- ✅ Seamless integration with op-sqlite's clean API
-- ✅ Full compatibility with Drizzle ORM for type-safe queries
-- ✅ Maintains compatibility with PowerSync for local-first replication
-- ✅ Automated native library deployment via Expo config plugin
-- ✅ Direct access to advanced spatial functions
+- Node.js 18+
+- pnpm (or npm)
+- Android Studio with SDK (for Android)
+- Xcode with iOS SDK (for iOS, future)
 
-This project demonstrates that while other approaches require manual extension loading, our solution provides the best of both worlds: full SpatiaLite functionality with the clean ecosystem integrations that make op-sqlite, Drizzle, and PowerSync so appealing.
+## Quick Start
 
-## 📋 Prerequisites
-
-Before running this project, ensure you have:
-
-- Node.js 18+ installed
-- Expo CLI installed (`npm install -g @expo/cli`)
-- For Android development: Android Studio with SDK
-- For iOS development: Xcode with iOS SDK
-
-## 🛠️ Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/expo-opsqlite-spatialite-demo.git
-   cd expo-opsqlite-spatialite-demo
-   ```
-
-2. Install dependencies:
-   ```bash
-   pnpm install
-   # or
-   npm install
-   ```
-
-3. Generate database migrations:
-   ```bash
-   pnpm db:migrate
-   # or
-   npx drizzle-kit generate
-   ```
-
-4. The project comes with pre-built spatialite libraries for Android (ARM64, ARMv7, x86, x86_64). If you need to update these libraries, check the `plugins/opsqlite-spatialite/spatialite-libs` directory.
-
-## 🏗️ Architecture
-
-### Plugin System
-The project uses a custom Expo config plugin (`plugins/opsqlite-spatialite/with-spatialite.js`) that automatically copies the necessary SpatiaLite `.so` files to the correct Android native libraries directory during the build process.
-
-### Drizzle ORM with Spatial Extensions
-The project extends Drizzle ORM with custom spatial data types in `lib/drizzle/drizzlespatialite-types.ts`, enabling:
-- Point, LineString, Polygon, and Multi-geometry types
-- GeoJSON-based spatial data handling
-- Direct integration with SpatiaLite functions
-
-### Data Access Layer
-Located in `lib/data-access-layer/`, this layer provides:
-- Spatial query examples (distance calculations)
-- CRUD operations for geospatial data
-- React Query integration for optimal data fetching
-
-## 🗺️ Key Components
-
-### Database Client
-`lib/drizzle/client.ts` sets up the database connection and loads the SpatiaLite extension:
-
-```javascript
-import { drizzle } from "drizzle-orm/op-sqlite";
-import { open } from "@op-engineering/op-sqlite";
-
-const opsqliteDb = open({
-  name: "myDB",
-});
-const path = "libspatialite";
-opsqliteDb.loadExtension(path, "sqlite3_modspatialite_init");
-export const db = drizzle(opsqliteDb, {
-  logger: true,
-  schema: schema,
-});
+```bash
+git clone https://github.com/tigawanna/expo-opsqlite-spatialite-demo.git
+cd expo-opsqlite-spatialite-demo
+pnpm install
 ```
 
-### Spatial Schema
-`lib/drizzle/schema/tables.ts` defines a table with spatial geometry:
+### Option A: Auto-download from GitHub Releases (recommended)
+
+In `app.json`, configure the plugin to download from a release:
+
+```json
+["./plugins/opsqlite-spatialite/with-spatialite", {
+  "version": "5.0.0"
+}]
+```
+
+Then prebuild and run:
+
+```bash
+pnpm prebuild:android
+pnpm android
+```
+
+The plugin will automatically download the correct `.so` files for all architectures, cache them in `~/.cache/spatialite-libs/`, and copy them into `android/app/src/main/jniLibs/`.
+
+### Option B: Local build (for development)
+
+If you're building SpatiaLite from source using [react-native-spatialite-artifacts](https://github.com/tigawanna/react-native-spatialite-artifacts):
+
+```json
+["./plugins/opsqlite-spatialite/with-spatialite", {
+  "version": "5.0.0",
+  "localPath": "../react-native-spatialite-artifacts/android/libs"
+}]
+```
+
+```bash
+# Build the artifacts first
+cd ../react-native-spatialite-artifacts
+mise run fetch
+mise run build:android
+
+# Then prebuild the demo app
+cd ../expo-opsqlite-spatialite-demo
+pnpm prebuild:android
+pnpm android
+```
+
+## Plugin Configuration
+
+The config plugin (`plugins/opsqlite-spatialite/with-spatialite.js`) accepts these options in `app.json`:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `version` | `"5.0.0"` | SpatiaLite version to download |
+| `repo` | `"tigawanna/react-native-spatialite-artifacts"` | GitHub repo for releases |
+| `localPath` | `null` | Path to local `.so` files (skips download) |
+
+The download cache location can be overridden with the `SPATIALITE_CACHE_DIR` environment variable.
+
+## Architecture
+
+### Database Client
+
+```javascript
+import { open } from "@op-engineering/op-sqlite";
+
+const opsqliteDb = open({ name: "myDB" });
+opsqliteDb.loadExtension("libspatialite", "sqlite3_modspatialite_init");
+```
+
+### Spatial Schema (Drizzle)
 
 ```typescript
 export const notes = table("notes", {
   id: t.integer("id").primaryKey({ autoIncrement: true }),
   title: t.text("title").notNull(),
   timestamp: t.text().default(sql`(CURRENT_TIMESTAMP)`),
-  pin: point("pin"), // Spatial geometry column
+  pin: point("pin"),
 });
 ```
 
 ### Spatial Queries
-The project demonstrates spatial queries like distance calculations in `lib/data-access-layer/todos.ts`:
 
 ```typescript
-// Calculate distance from Nairobi, Kenya
 const nairobiGeoJSON = '{"type":"Point","coordinates":[36.8219,-1.2921]}';
 const query = db
   .select({
@@ -128,80 +128,63 @@ const query = db
   .orderBy(sql`distance_km ASC`);
 ```
 
-## 🧪 Running the Project
+## Project Structure
 
-1. Start the development server:
-   ```bash
-   pnpm start
-   # or
-   npx expo start
-   ```
+```
+app/                          # Expo Router screens
+lib/
+  drizzle/
+    client.ts                 # Database connection + SpatiaLite loading
+    schema/tables.ts          # Drizzle schema with spatial types
+    drizzlespatialite-types.ts # Custom spatial column types
+    InitDatabase.tsx          # Migration runner component
+  data-access-layer/
+    todos.ts                  # CRUD + spatial queries
+    spatialite-query-options.ts
+  tanstack/query/             # React Query setup
+plugins/
+  opsqlite-spatialite/
+    with-spatialite.js        # Expo config plugin (auto-download + copy)
+drizzle/                      # Generated migrations
+```
 
-2. Choose your target platform:
-   - **Expo Go**: For quick testing with limitations (not all native modules supported)
-   - **Development Build**: For full native module access (recommended for this project)
-   - **Android/iOS simulators**: For native testing
+## Running the Project
 
-3. To build for Android with spatialite support:
-   ```bash
-   pnpm run:android
-   # or
-   npx expo run:android
-   ```
+```bash
+# Development
+pnpm start
 
-## 🍎 iOS Support
+# Android (requires dev build)
+pnpm prebuild:android
+pnpm android
 
-**Important**: The current implementation only supports Android. For iOS support, you'll need to:
+# Generate new migrations after schema changes
+pnpm db:migrate
+```
 
-1. Build the SpatiaLite library for iOS using [libspatialite-ios](https://github.com/gstf/libspatialite-ios)
-2. Follow the [op-sqlite extension loading guide](https://op-engineering.github.io/op-sqlite/docs/api/#loading-extensions) to place the files in the correct location
-3. Create an Expo config plugin similar to the Android one to automate the process
-4. Add the iOS native libraries to your project in the appropriate directories (typically `ios/` folder)
+## iOS Support
 
-The Android plugin in `plugins/opsqlite-spatialite/with-spatialite.js` serves as a reference for how to implement a similar solution for iOS using a config plugin.
+Android only for now. iOS support will require:
+1. Building SpatiaLite as a static library / dynamic framework for iOS
+2. Extending the config plugin with an iOS `withDangerousMod`
+3. Using op-sqlite's `getDylibPath` for extension loading
 
-## 🌐 Spatial Data Sources
+## Supported Spatial Operations
 
-This project demonstrates working with various spatial data formats:
-- **GeoJSON**: Native support for GeoJSON input/output
-- **WKB (Well-Known Binary)**: Internal storage format for geometry data
-- **Spatial Queries**: Distance calculations, spatial relationships, and geometric operations
+- **Geometry Creation**: `GeomFromGeoJSON()`, `GeomFromText()`
+- **Distance Calculations**: `ST_Distance()`
+- **Coordinate Extraction**: `ST_X()`, `ST_Y()`
+- **Spatial Indexing**: Built-in R-Tree support
+- **Geometry Functions**: `ST_Area()`, `ST_Length()`, `ST_Contains()`, `ST_Intersects()`, etc.
 
-## 📦 Spatialite Libraries
+## Acknowledgments
 
-The SpatiaLite `.so` files in this project are sourced from the [spatialite-for-android-nodejs](https://github.com/tigawanna/spatialite-for-android-nodejs) repository. The native libraries for different architectures (arm64-v8a, armeabi-v7a, x86, x86_64) are located in the `plugins/opsqlite-spatialite/spatialite-libs/jni/` directory.
+- [op-sqlite](https://github.com/OP-Engineering/op-sqlite) - SQLite wrapper for React Native
+- [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/index) - Spatial database engine
+- [react-native-spatialite-artifacts](https://github.com/tigawanna/react-native-spatialite-artifacts) - NDK r29 build scripts
+- [Drizzle ORM](https://orm.drizzle.team/) - Type-safe SQL builder
+- [React Query](https://tanstack.com/query/latest) - Data fetching and caching
 
-If you need to update these libraries, you can:
-1. Download the latest versions from the [spatialite-for-android-nodejs](https://github.com/tigawanna/spatialite-for-android-nodejs) repository
-2. Extract the appropriate `.so` files for each architecture
-3. Place them in the respective directories under `plugins/opsqlite-spatialite/spatialite-libs/jni/`
+## License
 
-## 🧩 Supported Spatial Operations
-
-This project demonstrates several SpatiaLite capabilities:
-
-1. **Geometry Creation**: `GeomFromGeoJSON()` for creating geometries from GeoJSON
-2. **Distance Calculations**: `ST_Distance()` for calculating distances between geometries
-3. **Coordinate Extraction**: `ST_X()` and `ST_Y()` for extracting coordinates from points
-4. **Spatial Indexing**: Efficient spatial queries with built-in indexing
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs or issues
-- Submit pull requests for improvements
-- Add new spatial query examples
-- Enhance documentation
-- Add iOS support for SpatiaLite
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 🙏 Acknowledgments
-
-- [op-sqlite](https://github.com/OP-Engineering/op-sqlite) for the SQLite wrapper
-- [SpatiaLite](https://www.gaia-gis.it/fossil/libspatialite/index) for the spatial database engine
-- [Drizzle ORM](https://orm.drizzle.team/) for the type-safe SQL builder
-- [React Query](https://tanstack.com/query/latest) for data fetching and caching
-- [spatialite-for-android-nodejs](https://github.com/tigawanna/spatialite-for-android-nodejs) for the Android native libraries
+MIT

@@ -28,7 +28,13 @@
     },
     "plugins": [
       "expo-router",
-      "./plugins/opsqlite-spatialite/with-spatialite",
+      [
+        "./plugins/opsqlite-spatialite/with-spatialite",
+        {
+          "version": "5.0.0",
+          "localPath": "../react-native-spatialite-artifacts/android/libs"
+        }
+      ],
       [
         "expo-splash-screen",
         {
