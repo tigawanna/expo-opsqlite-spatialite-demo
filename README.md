@@ -122,7 +122,7 @@ const query = db
     title: notes.title,
     latitude: sql<string>`ST_Y(${notes.pin})`.as("latitude"),
     longitude: sql<string>`ST_X(${notes.pin})`.as("longitude"),
-    distance: sql`Distance(SetSRID(${notes.pin}, 4326), SetSRID(GeomFromGeoJSON(${nairobiGeoJSON}), 4326), 1)`.as("distance"),
+    distance: distanceFromNairobiMeters.as("distance"),
   })
   .from(notes)
   .orderBy(sql`distance ASC`);

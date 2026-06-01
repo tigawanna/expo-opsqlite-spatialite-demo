@@ -1,5 +1,5 @@
 import { asc, sql } from "drizzle-orm";
-import { db } from "../drizzle/client";
+import { db, ensureSpatialMetadata } from "../drizzle/client";
 import { notes } from "../drizzle/schema/tables";
 import { formatExecutableSql } from "./sql-format";
 import { distanceFromNairobiMeters } from "./spatial-distance";
@@ -43,7 +43,7 @@ export function buildGetNotesQuery(sortByDistance: boolean) {
       title: notes.title,
       latitude: sql<string>`ST_Y(${notes.pin})`.as("latitude"),
       longitude: sql<string>`ST_X(${notes.pin})`.as("longitude"),
-      distance: sql`${distanceFromNairobiMeters}`.as("distance"),
+      distance: distanceFromNairobiMeters.as("distance"),
     })
     .from(notes);
 
@@ -76,6 +76,7 @@ export async function createNotes(): Promise<DataLayerResult<null>> {
 }
 
 export async function getNotes(sortByDistance = true): Promise<DataLayerResult<NoteRow[]>> {
+  await ensureSpatialMetadata();
   const query = buildGetNotesQuery(sortByDistance);
   const sqlPreview = formatExecutableSql(query);
 

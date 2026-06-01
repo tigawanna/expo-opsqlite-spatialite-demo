@@ -24,7 +24,6 @@ export function ListNotes() {
     isPending,
     error: queryError,
   } = useQuery(getNotesQueryOptions(sortByDistance));
-  console.log("data == ", data);
   const deleteNotesMutation = useMutation(deleteNoteMutationOptions);
   const notes = data?.result;
   const error = data?.error || queryError?.message;
