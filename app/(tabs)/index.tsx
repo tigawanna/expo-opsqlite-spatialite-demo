@@ -1,9 +1,10 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useMutation } from "@tanstack/react-query";
 
 import { ListNotes } from "@/components/notes/ListBotes";
-import { PillButton } from "@/components/notes/PillButton";
+import { NotesActionsMenuButton, NotesActionsSheet } from "@/components/notes/NotesActionsSheet";
 import { SqlPreview } from "@/components/notes/SqlPreview";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -14,6 +15,7 @@ import {
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function HomeScreen() {
+  const [actionsOpen, setActionsOpen] = useState(false);
   const deleteAllNotesMutation = useMutation(deleteAllNotesMutationOptions);
   const createNotesMutation = useMutation(createNotesMutationOptions);
   const muted = useThemeColor({ light: "#64748b", dark: "#8b949e" }, "icon");
@@ -29,22 +31,21 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ThemedView style={styles.root}>
-        <View style={styles.toolbar}>
-          <PillButton
-            title="Create"
-            variant="primary"
-            loading={createNotesMutation.isPending}
-            onPress={() => createNotesMutation.mutate()}
-            disabled={deleteAllNotesMutation.isPending}
-          />
-          <PillButton
-            title="Delete all"
-            variant="danger"
-            loading={deleteAllNotesMutation.isPending}
-            onPress={() => deleteAllNotesMutation.mutate()}
-            disabled={createNotesMutation.isPending}
-          />
+        <View style={styles.header}>
+          <ThemedText type="subtitle" style={styles.title}>
+            SpatiaLite notes
+          </ThemedText>
+          <NotesActionsMenuButton onPress={() => setActionsOpen(true)} />
         </View>
+
+        <NotesActionsSheet
+          isPresented={actionsOpen}
+          onDismiss={() => setActionsOpen(false)}
+          createPending={createNotesMutation.isPending}
+          deleteAllPending={deleteAllNotesMutation.isPending}
+          onCreate={() => createNotesMutation.mutate()}
+          onDeleteAll={() => deleteAllNotesMutation.mutate()}
+        />
 
         {statusMessage ? (
           <ThemedText style={[styles.status, { color: muted }]}>{statusMessage}</ThemedText>
@@ -52,7 +53,11 @@ export default function HomeScreen() {
 
         {mutationSql ? <SqlPreview sql={mutationSql} label="Last mutation SQL" /> : null}
 
-        <ListNotes />
+        <ListNotes
+          onSeed={() => createNotesMutation.mutate()}
+          seedPending={createNotesMutation.isPending}
+          actionsDisabled={createNotesMutation.isPending || deleteAllNotesMutation.isPending}
+        />
       </ThemedView>
     </SafeAreaView>
   );
@@ -65,12 +70,17 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  toolbar: {
+  header: {
     flexDirection: "row",
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingTop: 4,
+    paddingBottom: 4,
+    gap: 8,
+  },
+  title: {
+    flex: 1,
+    fontSize: 22,
   },
   status: {
     textAlign: "center",

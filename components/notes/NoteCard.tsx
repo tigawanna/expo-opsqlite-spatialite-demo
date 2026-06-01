@@ -39,10 +39,11 @@ export function formatDistanceKm(value: unknown): string | null {
 }
 
 export function NoteCard({ note, rank, showDistance, onDelete, deleting }: NoteCardProps) {
-  const cardBg = useThemeColor({ light: "#ffffff", dark: "#1c2128" }, "background");
-  const border = useThemeColor({ light: "#e2e8f0", dark: "#30363d" }, "icon");
+  const cardBg = useThemeColor({}, "card");
+  const border = useThemeColor({}, "cardBorder");
   const muted = useThemeColor({ light: "#64748b", dark: "#8b949e" }, "icon");
   const accent = useThemeColor({}, "tint");
+  const onAccent = useThemeColor({}, "onPrimary");
   const distanceLabel = showDistance ? formatDistanceKm(readDistanceMeters(note)) : null;
 
   return (
@@ -55,7 +56,7 @@ export function NoteCard({ note, rank, showDistance, onDelete, deleting }: NoteC
       ]}>
       <View style={styles.row}>
         <View style={[styles.rankBadge, { backgroundColor: accent }]}>
-          <ThemedText style={styles.rankText}>{rank}</ThemedText>
+          <ThemedText style={[styles.rankText, { color: onAccent }]}>{rank}</ThemedText>
         </View>
         <View style={styles.body}>
           <ThemedText type="defaultSemiBold" style={styles.title}>
@@ -100,7 +101,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   rankText: {
-    color: "#fff",
     fontWeight: "700",
     fontSize: 14,
   },

@@ -21,8 +21,8 @@ export function SqlPreview({
   visibleLines = DEFAULT_VISIBLE_LINES,
 }: SqlPreviewProps) {
   const [expanded, setExpanded] = useState(true);
-  const panelBg = useThemeColor({ light: "#f4f6f8", dark: "#161b22" }, "background");
-  const border = useThemeColor({ light: "#d0d7de", dark: "#30363d" }, "icon");
+  const panelBg = useThemeColor({}, "card");
+  const border = useThemeColor({}, "cardBorder");
   const accent = useThemeColor({}, "tint");
 
   const formattedSql = useMemo(() => (sql ? formatSqlMultiline(sql) : ""), [sql]);

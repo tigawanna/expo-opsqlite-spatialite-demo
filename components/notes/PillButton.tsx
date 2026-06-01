@@ -8,6 +8,7 @@ import {
 } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 type PillVariant = "primary" | "danger" | "neutral";
 
@@ -18,15 +19,6 @@ type PillButtonProps = PressableProps & {
   style?: StyleProp<ViewStyle>;
 };
 
-const variantStyles: Record<
-  PillVariant,
-  { background: string; text: string; border: string }
-> = {
-  primary: { background: "#16a34a", text: "#ffffff", border: "#15803d" },
-  danger: { background: "#dc2626", text: "#ffffff", border: "#b91c1c" },
-  neutral: { background: "#334155", text: "#f8fafc", border: "#475569" },
-};
-
 export function PillButton({
   title,
   variant = "neutral",
@@ -35,7 +27,19 @@ export function PillButton({
   style,
   ...rest
 }: PillButtonProps) {
-  const colors = variantStyles[variant];
+  const tint = useThemeColor({}, "tint");
+  const onPrimary = useThemeColor({}, "onPrimary");
+  const card = useThemeColor({}, "card");
+  const cardBorder = useThemeColor({}, "cardBorder");
+  const onSurfaceVariant = useThemeColor({}, "icon");
+
+  const colors =
+    variant === "primary"
+      ? { background: tint, text: onPrimary, border: tint }
+      : variant === "danger"
+        ? { background: tint, text: onPrimary, border: tint }
+        : { background: card, text: onSurfaceVariant, border: cardBorder };
+
   const isDisabled = disabled || loading;
 
   return (

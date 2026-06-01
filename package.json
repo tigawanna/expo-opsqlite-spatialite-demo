@@ -14,6 +14,8 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo/material-symbols": "^0.1.1",
+    "@expo/ui": "~56.0.15",
     "@expo/vector-icons": "^15.0.3",
     "@op-engineering/op-sqlite": "^15.0.7",
     "@tanstack/react-query": "^5.90.5",

@@ -12,11 +12,18 @@ import {
   getNotesQueryOptions,
 } from "@/lib/data-access-layer/todos-query-optons";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { SEED_LABEL, SEED_PENDING_LABEL } from "@/components/notes/notes-action-labels";
 import { useState } from "react";
 
 const NAIROBI_LABEL = "Nairobi (−1.2921, 36.8219)";
 
-export function ListNotes() {
+type ListNotesProps = {
+  onSeed: () => void;
+  seedPending: boolean;
+  actionsDisabled: boolean;
+};
+
+export function ListNotes({ onSeed, seedPending, actionsDisabled }: ListNotesProps) {
   const [sortBy, setSortBy] = useState<"distance" | "title">("distance");
   const sortByDistance = sortBy === "distance";
   const {
@@ -47,9 +54,6 @@ export function ListNotes() {
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}>
       <ThemedView style={styles.section}>
-        <ThemedText type="subtitle" style={styles.heading}>
-          SpatiaLite notes
-        </ThemedText>
         <ThemedText style={[styles.subheading, { color: muted }]}>
           {sortByDistance
             ? `Sorted by distance from ${NAIROBI_LABEL}`
@@ -94,8 +98,16 @@ export function ListNotes() {
           <ThemedView style={styles.empty}>
             <ThemedText type="defaultSemiBold">No notes yet</ThemedText>
             <ThemedText style={{ color: muted, textAlign: "center" }}>
-              Tap Create to seed landmarks, then sort by distance from Nairobi.
+              Seed sample landmarks, then sort by distance from Nairobi.
             </ThemedText>
+            <PillButton
+              title={seedPending ? SEED_PENDING_LABEL : SEED_LABEL}
+              variant="primary"
+              loading={seedPending}
+              disabled={actionsDisabled}
+              onPress={onSeed}
+              style={styles.seedButton}
+            />
           </ThemedView>
         )}
       </View>
@@ -116,9 +128,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     gap: 6,
-  },
-  heading: {
-    fontSize: 22,
   },
   subheading: {
     fontSize: 14,
@@ -141,9 +150,15 @@ const styles = StyleSheet.create({
   },
   empty: {
     alignItems: "center",
-    gap: 8,
+    gap: 12,
     paddingVertical: 24,
     paddingHorizontal: 12,
+  },
+  seedButton: {
+    flex: 0,
+    alignSelf: "stretch",
+    maxWidth: 280,
+    marginTop: 4,
   },
   errorBox: {
     flex: 1,
