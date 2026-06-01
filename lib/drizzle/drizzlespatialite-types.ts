@@ -16,7 +16,7 @@ export const point = customType<{
     return "blob";
   },
   toDriver(value) {
-    return sql`GeomFromGeoJSON(${value})`;
+    return sql`SetSRID(GeomFromGeoJSON(${value}), 4326)`;
   },
 });
 
